@@ -8,3 +8,13 @@ D:\Study Ground\Univer\Term 6\Windows coding\Project\First_demo\First_demo\obj\D
 D:\Study Ground\Univer\Term 6\Windows coding\Project\First_demo\First_demo\obj\Debug\First_demo.csproj.CoreCompileInputs.cache
 D:\Study Ground\Univer\Term 6\Windows coding\Project\First_demo\First_demo\obj\Debug\First_demo.exe
 D:\Study Ground\Univer\Term 6\Windows coding\Project\First_demo\First_demo\obj\Debug\First_demo.pdb
+D:\Study Ground\Univer\Term 6\Windows coding\Project\Project-Windows-Form\First_demo\bin\Debug\First_demo.exe.config
+D:\Study Ground\Univer\Term 6\Windows coding\Project\Project-Windows-Form\First_demo\bin\Debug\First_demo.exe
+D:\Study Ground\Univer\Term 6\Windows coding\Project\Project-Windows-Form\First_demo\bin\Debug\First_demo.pdb
+D:\Study Ground\Univer\Term 6\Windows coding\Project\Project-Windows-Form\First_demo\obj\Debug\First_demo.csprojAssemblyReference.cache
+D:\Study Ground\Univer\Term 6\Windows coding\Project\Project-Windows-Form\First_demo\obj\Debug\First_demo.Form1.resources
+D:\Study Ground\Univer\Term 6\Windows coding\Project\Project-Windows-Form\First_demo\obj\Debug\First_demo.Properties.Resources.resources
+D:\Study Ground\Univer\Term 6\Windows coding\Project\Project-Windows-Form\First_demo\obj\Debug\First_demo.csproj.GenerateResource.cache
+D:\Study Ground\Univer\Term 6\Windows coding\Project\Project-Windows-Form\First_demo\obj\Debug\First_demo.csproj.CoreCompileInputs.cache
+D:\Study Ground\Univer\Term 6\Windows coding\Project\Project-Windows-Form\First_demo\obj\Debug\First_demo.exe
+D:\Study Ground\Univer\Term 6\Windows coding\Project\Project-Windows-Form\First_demo\obj\Debug\First_demo.pdb
