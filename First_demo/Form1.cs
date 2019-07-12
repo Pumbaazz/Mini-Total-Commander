@@ -25,30 +25,40 @@ namespace First_demo
             foreach (DriveInfo d in drives)
             {
                 comboBox1.Items.Add(d.Name);
+                comboBox2.Items.Add(d.Name);
             }
         }
 
-        private void cmbDrive_SelectedIndexChanged(object sender, EventArgs e)
+        private void cmbDrive1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            listView1.Items.Clear();
-            Fill(comboBox1.Text);
+            Fill(comboBox1.Text, listView1);
         }
-        void Fill(string s)
+
+        private void cmbDrive2_SelectedIndexChanged(object sender, EventArgs e)
         {
-            DirectoryInfo Directory = new DirectoryInfo(s);
-            DirectoryInfo[] Directories = Directory.GetDirectories();
-            FileInfo[] files = Directory.GetFiles();
+            Fill(comboBox2.Text, listView2);
+        }
+
+        void Fill(string s, ListView listViewNum)
+        {
+            DirectoryInfo directoryInfo = new DirectoryInfo(s);
+            DirectoryInfo[] Directories = directoryInfo.GetDirectories();
+            FileInfo[] files = directoryInfo.GetFiles();
+
+            listViewNum.Items.Clear();
+
             foreach (DirectoryInfo d in Directories)
             {
                 ListViewItem lvi = new ListViewItem(d.Name);
                 lvi.SubItems.Add("Folder");
-                listView1.Items.Add(lvi);
+                listViewNum.Items.Add(lvi);
             }
+            
             foreach (FileInfo d in files)
             {
                 ListViewItem lvi = new ListViewItem(d.Name);
                 lvi.SubItems.Add("File");
-                listView1.Items.Add(lvi);
+                listViewNum.Items.Add(lvi);
             }
         }
     }
