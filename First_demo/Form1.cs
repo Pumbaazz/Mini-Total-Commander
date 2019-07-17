@@ -22,6 +22,10 @@ namespace First_demo
         private
         DirectoryInfo leftDirect;
         DirectoryInfo rightDirect;
+        bool listview1_isActived = true;
+
+
+
         string notepadlink = "C:\\Windows\\Notepad.exe";
         string vscodeLink = "C:\\Users\\nguyn\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe";
 
@@ -29,6 +33,11 @@ namespace First_demo
         public Form1()
         {
             InitializeComponent();
+
+            //textBox1.TextChanged += Change_address;
+            //textBox2.TextChanged += Change_address;
+            //textBox1.KeyPress += EnterKey_addressLeft;
+            //textBox2.KeyPress += EnterKey_addressRight;
         }
 
         //load drive
@@ -40,45 +49,30 @@ namespace First_demo
                 comboBox1.Items.Add(d.Name);
                 comboBox2.Items.Add(d.Name);
             }
-            comboBox1.SelectedItem = comboBox1.Items[0];
-            Fill(comboBox1.Items[0].ToString(), listView1);
+            //comboBox1.SelectedItem = comboBox1.Items[0];
+            //Fill(comboBox1.Items[0].ToString(), listView1);
 
-            comboBox2.SelectedItem = comboBox2.Items[0];
-            Fill(comboBox2.Items[0].ToString(), listView2);
+            //comboBox2.SelectedItem = comboBox2.Items[0];
+            //Fill(comboBox2.Items[0].ToString(), listView2);
 
-            //textBox1.Text = comboBox1.Items[0].ToString();
-            textBox2.Text = comboBox2.Items[0].ToString();
-            //leftDirect = new DirectoryInfo("C:\\");
-            //rightDirect = new DirectoryInfo("C:\\");
+            ////textBox1.Text = comboBox1.Items[0].ToString();
+            leftDirect = new DirectoryInfo("C:\\");
+            rightDirect = new DirectoryInfo("C:\\");
         }
-    
+
 
         private void cmbDrive1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            try
-            {
-                var drive1 = comboBox1.SelectedItem.ToString();
-                textBox1.Text = drive1;
-                Fill(drive1, listView1);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
+            leftDirect = new DirectoryInfo(comboBox1.SelectedItem.ToString());
+            textBox1.Text = comboBox1.SelectedItem.ToString();
+            Fill(leftDirect, listView1);
         }
 
         private void cmbDrive2_SelectedIndexChanged(object sender, EventArgs e)
         {
-            try
-            {
-                var drive2 = comboBox2.SelectedItem.ToString();
-                textBox2.Text = drive2;
-                Fill(drive2, listView2);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
+            rightDirect = new DirectoryInfo(comboBox2.SelectedItem.ToString());
+            textBox2.Text = comboBox2.SelectedItem.ToString();
+            Fill(rightDirect, listView2);
         }
 
         //fill the list of file in list view
@@ -93,53 +87,51 @@ namespace First_demo
             listView2.View = View.List;
         }
 
-        private void Fill(string s, ListView listViewNum)
+        private void Fill(DirectoryInfo directoryNum, ListView listViewNum)
         {
-            if (Directory.Exists(s))
+            listViewNum.BeginUpdate();
+            listViewNum.Items.Clear();
+            if (directoryNum.Parent != null)
             {
-                DirectoryInfo directoryInfo = new DirectoryInfo(s);
-                FileInfo[] files = directoryInfo.GetFiles();
-                DirectoryInfo[] Directories = directoryInfo.GetDirectories();
-
-                listViewNum.Items.Clear();
-                try
+                ListViewItem rollBack = new ListViewItem("...");
+                rollBack.Tag = directoryNum;
+                rollBack.Name = "Directory";
+                rollBack.SubItems.Add("--DIR--");
+                listViewNum.Items.Add(rollBack);
+            }
+            DirectoryInfo[] Directories = directoryNum.GetDirectories();
+            FileInfo[] files = directoryNum.GetFiles();
+        foreach (DirectoryInfo dir in Directories)
+        {
+                if (!dir.Attributes.HasFlag(FileAttributes.System))
                 {
-                    foreach (DirectoryInfo dir in Directories)
-                    {
-                        //bool isHidden = (File.GetAttributes(dir.FullName) & FileAttributes.Hidden) == FileAttributes.Hidden;
-                        //if (!isHidden)
-                        {
-                            ListViewItem lvi = new ListViewItem(dir.Name);
-                            lvi.SubItems.Add("Folder");
-                            lvi.Tag = dir;
-                            lvi.Name = "Directory";
-                            lvi.SubItems.Add("<--DIR-->");
-                            lvi.SubItems.Add(dir.LastWriteTime.ToString());
-                            listViewNum.Items.Add(lvi);
-                        }
-                    }
-
-                    foreach (FileInfo file in files)
-                    {
-                        //bool isHidden = (File.GetAttributes(file.FullName) & FileAttributes.Hidden) == FileAttributes.Hidden;
-                        //if (!isHidden)
-                        {
-                            ListViewItem lvi = new ListViewItem(file.Name);
-                            lvi.SubItems.Add("File");
-                            lvi.Tag = file;
-                            lvi.Name = "File";
-                            //lvi.SubItems.Add(FormattedSize(file.Length));
-                            lvi.SubItems.Add(file.LastWriteTime.ToString());
-                            listViewNum.Items.Add(lvi);
-                        }
-                    }
-                }
-                catch (System.Exception except)
-                {
-                    MessageBox.Show(except.Message);
-                }
+                ListViewItem lvi = new ListViewItem(dir.Name);
+                lvi.SubItems.Add("Folder");
+                lvi.Tag = dir;
+                lvi.Name = "Directory";
+                lvi.SubItems.Add("<--DIR-->");
+                lvi.SubItems.Add(dir.LastWriteTime.ToString());
+                listViewNum.Items.Add(lvi);
             }
         }
+
+        foreach (FileInfo file in files)
+        {
+            //bool isHidden = (File.GetAttributes(file.FullName) & FileAttributes.Hidden) == FileAttributes.Hidden;
+            //if (!isHidden)
+            {
+                ListViewItem lvi = new ListViewItem(file.Name);
+                lvi.SubItems.Add("File");
+                lvi.Tag = file;
+                lvi.Name = "File";
+                //lvi.SubItems.Add(FormattedSize(file.Length));
+                lvi.SubItems.Add(file.LastWriteTime.ToString());
+                listViewNum.Items.Add(lvi);
+            }
+        }
+            listViewNum.EndUpdate();   
+    }
+
 
         //Refresh Button
         private void refreshButton1_Clicks(object sender, EventArgs e)
@@ -155,8 +147,9 @@ namespace First_demo
         //Event Click
         private void List1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            textBox1.Text = textBox1.Text + "\\" + listView1.SelectedItems[0].Text;
-            Fill(textBox1.Text, listView1);
+            //textBox1.Text = textBox1.Text + "\\" + listView1.SelectedItems[0].Text;
+            listview1_isActived = true;
+            Fill(leftDirect, listView1);
         }
         private string listview_1click(ListView listNum)
         {
@@ -164,41 +157,58 @@ namespace First_demo
         }
         private void List2_SelectedIndexChanged(object sender, EventArgs e)
         {
-            textBox2.Text = textBox2.Text + "\\" + listView2.SelectedItems[0].Text;
-            Fill(textBox2.Text, listView2);
+            listview1_isActived = false;
+            Fill(rightDirect, listView2);
         }
 
-        private void listView_doubleClick(ListView listviewNum, TextBox textBoxNum)
+        private void listView_doubleClick(ListView listviewNum, DirectoryInfo directNum, TextBox textBoxNum)
         {
-            if(listviewNum.SelectedItems[0].Name == "File")
+            if (listviewNum.SelectedItems[0].Name == "File")
             {
-                string fileName = textBoxNum.Text + listview_1click(listviewNum);
-                Process.Start(fileName);
+                FileInfo file = listviewNum.SelectedItems[0].Tag as FileInfo;
+                Process.Start(file.FullName);
             }
-            else 
+            else
             {
-                textBoxNum.Text = textBoxNum.Text + listview_1click(listviewNum);
+                if (listviewNum.SelectedItems[0].Text != "...")
+                {
+                    directNum = listviewNum.SelectedItems[0].Tag as DirectoryInfo;
+                }
+                else
+                {
+                    directNum = (listviewNum.SelectedItems[0].Tag as DirectoryInfo).Parent;
+                }
             }
-            
-            Fill(textBoxNum.Text, listviewNum);
+            textBoxNum.Text = directNum.FullName;
+            Fill(directNum, listviewNum);
         }
 
         private void listView1_2Click(object sender, EventArgs e)
         {
-            listView_doubleClick(listView1, textBox1);
+            listview1_isActived = true;
+            listView_doubleClick(listView1, leftDirect, textBox1);
         }
 
         private void listView2_2Click(object sender, EventArgs e)
         {
-            listView_doubleClick(listView2, textBox2);
+            listview1_isActived = false;
+            listView_doubleClick(listView2, leftDirect, textBox2);
         }
         //read file
         public void viewFile(object sender, EventArgs e)
         {
             ViewForm vi = new ViewForm();
-            string fileName = listview_1click(listView1);
-            vi.readFile(textBox1.Text + "\\" + fileName);
-
+            string fileName;
+            if(listview1_isActived == true)
+            {
+                fileName= listview_1click(listView1);
+                vi.readFile(textBox1.Text + "\\" + fileName);
+            }
+            else
+            {
+                fileName = listview_1click(listView2);
+                vi.readFile(textBox2.Text + "\\" + fileName);
+            }
         }
         //about button in menu strip
         private void MenuStripAbout_Click(object sender, EventArgs e)
@@ -221,6 +231,25 @@ namespace First_demo
         private void vscode_menuStrip(object sender, EventArgs e)
         {
             Process.Start(vscodeLink);
+        }
+
+        //edit file
+        private void editFile_button(ListView listViewNum)
+        {
+            FileInfo file = listViewNum.SelectedItems[0].Tag as FileInfo;
+
+        }
+
+        private void editFile_Click(object sender, EventArgs e)
+        {
+            if(listview1_isActived == true)
+            {
+                editFile_button(listView1);
+            }
+            else
+            {
+                editFile_button(listView2);
+            }
         }
     }
 }

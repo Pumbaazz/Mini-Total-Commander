@@ -145,8 +145,9 @@
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(143, 22);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItem1.Text = "View";
+            this.toolStripMenuItem1.Click += new System.EventHandler(this.viewFile);
             // 
             // editToolStripMenuItem
             // 
@@ -267,6 +268,7 @@
             this.button4.TabIndex = 10;
             this.button4.Text = "Edit";
             this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.editFile_Click);
             // 
             // button5
             // 
@@ -329,6 +331,7 @@
             // Form1
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+            this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(697, 500);
             this.Controls.Add(this.button10);
             this.Controls.Add(this.button9);
@@ -348,6 +351,7 @@
             this.Controls.Add(this.comboBox1);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
+            this.MaximizeBox = false;
             this.Name = "Form1";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
