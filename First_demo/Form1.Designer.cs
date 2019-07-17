@@ -80,7 +80,7 @@
             this.listView1.TabIndex = 1;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.List;
-            this.listView1.DoubleClick += new System.EventHandler(this.List1_SelectedIndexChanged);
+            this.listView1.DoubleClick += new System.EventHandler(this.listView1_2Click);
             // 
             // textBox1
             // 
@@ -105,7 +105,7 @@
             this.listView2.TabIndex = 4;
             this.listView2.UseCompatibleStateImageBehavior = false;
             this.listView2.View = System.Windows.Forms.View.List;
-            this.listView2.DoubleClick += new System.EventHandler(this.List2_SelectedIndexChanged);
+            this.listView2.DoubleClick += new System.EventHandler(this.listView2_2Click);
             // 
             // comboBox2
             // 
@@ -192,6 +192,7 @@
             this.vSCodeToolStripMenuItem.Name = "vSCodeToolStripMenuItem";
             this.vSCodeToolStripMenuItem.Size = new System.Drawing.Size(128, 22);
             this.vSCodeToolStripMenuItem.Text = "VS Code";
+            this.vSCodeToolStripMenuItem.Click += new System.EventHandler(this.vscode_menuStrip);
             // 
             // notepadToolStripMenuItem
             // 

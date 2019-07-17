@@ -18,6 +18,14 @@ namespace First_demo
 {
     public partial class Form1 : Form
     {
+        //some global variables
+        private
+        DirectoryInfo leftDirect;
+        DirectoryInfo rightDirect;
+        string notepadlink = "C:\\Windows\\Notepad.exe";
+        string vscodeLink = "C:\\Users\\nguyn\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe";
+
+
         public Form1()
         {
             InitializeComponent();
@@ -32,17 +40,45 @@ namespace First_demo
                 comboBox1.Items.Add(d.Name);
                 comboBox2.Items.Add(d.Name);
             }
+            comboBox1.SelectedItem = comboBox1.Items[0];
+            Fill(comboBox1.Items[0].ToString(), listView1);
+
+            comboBox2.SelectedItem = comboBox2.Items[0];
+            Fill(comboBox2.Items[0].ToString(), listView2);
+
+            //textBox1.Text = comboBox1.Items[0].ToString();
+            textBox2.Text = comboBox2.Items[0].ToString();
+            //leftDirect = new DirectoryInfo("C:\\");
+            //rightDirect = new DirectoryInfo("C:\\");
         }
     
 
         private void cmbDrive1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            Fill(comboBox1.Text, listView1);
+            try
+            {
+                var drive1 = comboBox1.SelectedItem.ToString();
+                textBox1.Text = drive1;
+                Fill(drive1, listView1);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         private void cmbDrive2_SelectedIndexChanged(object sender, EventArgs e)
         {
-            Fill(comboBox2.Text, listView2);
+            try
+            {
+                var drive2 = comboBox2.SelectedItem.ToString();
+                textBox2.Text = drive2;
+                Fill(drive2, listView2);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         //fill the list of file in list view
@@ -68,24 +104,32 @@ namespace First_demo
                 listViewNum.Items.Clear();
                 try
                 {
-                    foreach (DirectoryInfo d in Directories)
+                    foreach (DirectoryInfo dir in Directories)
                     {
-                        bool isHidden = (File.GetAttributes(d.FullName) & FileAttributes.Hidden) == FileAttributes.Hidden;
-                        if (!isHidden)
+                        //bool isHidden = (File.GetAttributes(dir.FullName) & FileAttributes.Hidden) == FileAttributes.Hidden;
+                        //if (!isHidden)
                         {
-                            ListViewItem lvi = new ListViewItem(d.Name);
+                            ListViewItem lvi = new ListViewItem(dir.Name);
                             lvi.SubItems.Add("Folder");
+                            lvi.Tag = dir;
+                            lvi.Name = "Directory";
+                            lvi.SubItems.Add("<--DIR-->");
+                            lvi.SubItems.Add(dir.LastWriteTime.ToString());
                             listViewNum.Items.Add(lvi);
                         }
                     }
 
-                    foreach (FileInfo d in files)
+                    foreach (FileInfo file in files)
                     {
-                        bool isHidden = (File.GetAttributes(d.FullName) & FileAttributes.Hidden) == FileAttributes.Hidden;
-                        if (!isHidden)
+                        //bool isHidden = (File.GetAttributes(file.FullName) & FileAttributes.Hidden) == FileAttributes.Hidden;
+                        //if (!isHidden)
                         {
-                            ListViewItem lvi = new ListViewItem(d.Name);
+                            ListViewItem lvi = new ListViewItem(file.Name);
                             lvi.SubItems.Add("File");
+                            lvi.Tag = file;
+                            lvi.Name = "File";
+                            //lvi.SubItems.Add(FormattedSize(file.Length));
+                            lvi.SubItems.Add(file.LastWriteTime.ToString());
                             listViewNum.Items.Add(lvi);
                         }
                     }
@@ -111,24 +155,49 @@ namespace First_demo
         //Event Click
         private void List1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            //string fileName = listView1.Items[listView1.SelectedIndex].ToString();
             textBox1.Text = textBox1.Text + "\\" + listView1.SelectedItems[0].Text;
-            string currentPath = textBox1.Text;
-            Fill(currentPath, listView1);
+            Fill(textBox1.Text, listView1);
+        }
+        private string listview_1click(ListView listNum)
+        {
+            return listNum.SelectedItems[0].Text;
         }
         private void List2_SelectedIndexChanged(object sender, EventArgs e)
         {
-            textBox2.Text = textBox2.Text + "\\" + listView2.SelectedItems[0].Text; 
-            string currentPath = textBox2.Text;
-            Fill(currentPath, listView2);
+            textBox2.Text = textBox2.Text + "\\" + listView2.SelectedItems[0].Text;
+            Fill(textBox2.Text, listView2);
+        }
+
+        private void listView_doubleClick(ListView listviewNum, TextBox textBoxNum)
+        {
+            if(listviewNum.SelectedItems[0].Name == "File")
+            {
+                string fileName = textBoxNum.Text + listview_1click(listviewNum);
+                Process.Start(fileName);
+            }
+            else 
+            {
+                textBoxNum.Text = textBoxNum.Text + listview_1click(listviewNum);
+            }
+            
+            Fill(textBoxNum.Text, listviewNum);
+        }
+
+        private void listView1_2Click(object sender, EventArgs e)
+        {
+            listView_doubleClick(listView1, textBox1);
+        }
+
+        private void listView2_2Click(object sender, EventArgs e)
+        {
+            listView_doubleClick(listView2, textBox2);
         }
         //read file
         public void viewFile(object sender, EventArgs e)
         {
             ViewForm vi = new ViewForm();
-            string fileName = listView1.SelectedItems[0].Text;
-            string currentPath = Path.GetFullPath(fileName);
-            vi.readFile(currentPath);
+            string fileName = listview_1click(listView1);
+            vi.readFile(textBox1.Text + "\\" + fileName);
 
         }
         //about button in menu strip
@@ -148,8 +217,11 @@ namespace First_demo
             this.Close();
         }
 
-        //icon in list view
-       
+        //show vs code 
+        private void vscode_menuStrip(object sender, EventArgs e)
+        {
+            Process.Start(vscodeLink);
+        }
     }
 }
 
