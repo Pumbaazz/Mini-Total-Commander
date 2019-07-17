@@ -22,13 +22,9 @@ namespace First_demo
         private
         DirectoryInfo leftDirect;
         DirectoryInfo rightDirect;
+        string notepadLink = "C:\\Windows\\system32\\notepad.exe";
+        string vscodeLink = "C:\\Users\\nguyn\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe"; 
         bool listview1_isActived = true;
-
-
-
-        string notepadlink = "C:\\Windows\\Notepad.exe";
-        string vscodeLink = "C:\\Users\\nguyn\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe";
-
 
         public Form1()
         {
@@ -83,6 +79,7 @@ namespace First_demo
         }
         private void listView(object sender, EventArgs e)
         {
+
             listView1.View = View.List;
             listView2.View = View.List;
         }
@@ -101,36 +98,38 @@ namespace First_demo
             }
             DirectoryInfo[] Directories = directoryNum.GetDirectories();
             FileInfo[] files = directoryNum.GetFiles();
-        foreach (DirectoryInfo dir in Directories)
-        {
+            foreach (DirectoryInfo dir in Directories)
+            {
                 if (!dir.Attributes.HasFlag(FileAttributes.System))
                 {
-                ListViewItem lvi = new ListViewItem(dir.Name);
-                lvi.SubItems.Add("Folder");
-                lvi.Tag = dir;
-                lvi.Name = "Directory";
-                lvi.SubItems.Add("<--DIR-->");
-                lvi.SubItems.Add(dir.LastWriteTime.ToString());
-                listViewNum.Items.Add(lvi);
+                    ListViewItem lvi = new ListViewItem(dir.Name);
+                    lvi.SubItems.Add("Folder");
+                    lvi.Tag = dir;
+                    lvi.Name = "Directory";
+                    lvi.SubItems.Add("<--DIR-->");
+                    lvi.SubItems.Add(dir.LastWriteTime.ToString());
+                    listViewNum.Items.Add(lvi);
+                    //Icon icon = GetIcon(directoryNum.FullName, false, false);
+                }
             }
-        }
 
-        foreach (FileInfo file in files)
-        {
-            //bool isHidden = (File.GetAttributes(file.FullName) & FileAttributes.Hidden) == FileAttributes.Hidden;
-            //if (!isHidden)
+            foreach (FileInfo file in files)
             {
-                ListViewItem lvi = new ListViewItem(file.Name);
-                lvi.SubItems.Add("File");
-                lvi.Tag = file;
-                lvi.Name = "File";
-                //lvi.SubItems.Add(FormattedSize(file.Length));
-                lvi.SubItems.Add(file.LastWriteTime.ToString());
-                listViewNum.Items.Add(lvi);
+                //bool isHidden = (File.GetAttributes(file.FullName) & FileAttributes.Hidden) == FileAttributes.Hidden;
+                //if (!isHidden)
+                {
+                    ListViewItem lvi = new ListViewItem(file.Name);
+                    lvi.SubItems.Add("File");
+                    lvi.Tag = file;
+                    lvi.Name = "File";
+                    //lvi.SubItems.Add(FormattedSize(file.Length));
+                    lvi.SubItems.Add(file.LastWriteTime.ToString());
+                    listViewNum.Items.Add(lvi);
+                    //Icon icon = GetIcon(directoryNum.FullName, false, false);
+                }
             }
+            listViewNum.EndUpdate();
         }
-            listViewNum.EndUpdate();   
-    }
 
 
         //Refresh Button
@@ -199,9 +198,9 @@ namespace First_demo
         {
             ViewForm vi = new ViewForm();
             string fileName;
-            if(listview1_isActived == true)
+            if (listview1_isActived == true)
             {
-                fileName= listview_1click(listView1);
+                fileName = listview_1click(listView1);
                 vi.readFile(textBox1.Text + "\\" + fileName);
             }
             else
@@ -234,15 +233,31 @@ namespace First_demo
         }
 
         //edit file
+
         private void editFile_button(ListView listViewNum)
         {
             FileInfo file = listViewNum.SelectedItems[0].Tag as FileInfo;
-
+            if (MessageBox.Show("Bạn muốn mở bằng VS Code không??", @"Noticed me !!!", MessageBoxButtons.YesNo) == DialogResult.Yes) 
+            {
+                Process.Start(vscodeLink, file.FullName);
+            }
+            else 
+            {
+                Process.Start(notepadLink, file.FullName);
+            }
+            //bug nhẹ là không nhận dấu space
         }
-
+        private void listview1_click(object sender, EventArgs e)
+        {
+            listview1_isActived = true;
+        }
+        private void listview2_click(object sender, EventArgs e)
+        {
+            listview1_isActived = false;
+        }
         private void editFile_Click(object sender, EventArgs e)
         {
-            if(listview1_isActived == true)
+            if (listview1_isActived == true)
             {
                 editFile_button(listView1);
             }
@@ -251,6 +266,60 @@ namespace First_demo
                 editFile_button(listView2);
             }
         }
+
+        /*this is some of stackoverflow code for icon system
+
+        [DllImport("Shell32.dll")]
+        private static extern int SHGetFileInfo(
+                string pszPath, uint dwFileAttributes,
+                out SHFILEINFO psfi, uint cbfileInfo,
+                SHGFI uFlags);
+
+        private struct SHFILEINFO
+        {
+            public SHFILEINFO(bool b)
+            {
+                hIcon = IntPtr.Zero; iIcon = 0; dwAttributes = 0; szDisplayName = ""; szTypeName = "";
+            }
+            public IntPtr hIcon;
+            public int iIcon;
+            public uint dwAttributes;
+            public string szDisplayName;
+            public string szTypeName;
+        };
+
+        private enum SHGFI
+        {
+            SmallIcon = 0x00000001,
+            OpenIcon = 0x00000002,
+            LargeIcon = 0x00000000,
+            Icon = 0x00000100,
+            DisplayName = 0x00000200,
+            Typename = 0x00000400,
+            SysIconIndex = 0x00004000,
+            LinkOverlay = 0x00008000,
+            UseFileAttributes = 0x00000010
+        }
+
+        public static Icon GetIcon(string strPath, bool bSmall, bool bOpen)
+        {
+            SHFILEINFO info = new SHFILEINFO(true);
+            int cbFileInfo = Marshal.SizeOf(info);
+            SHGFI flags;
+
+            if (bSmall)
+                flags = SHGFI.Icon | SHGFI.SmallIcon;
+            else
+                flags = SHGFI.Icon | SHGFI.LargeIcon;
+
+            if (bOpen) flags = flags | SHGFI.OpenIcon;
+
+            SHGetFileInfo(strPath, 0, out info, (uint)cbFileInfo, flags);
+
+            return Icon.FromHandle(info.hIcon);
+        }*/
+
+
+
     }
 }
-

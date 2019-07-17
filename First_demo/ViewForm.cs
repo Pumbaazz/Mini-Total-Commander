@@ -25,7 +25,7 @@ namespace First_demo
             string str;
             str = sr.ReadToEnd();
             ViewForm view1 = new ViewForm();
-
+            view1.Text = "View Dialog";
             view1.textBox1.Text = str;
             view1.Show();
             
