@@ -372,5 +372,51 @@ namespace First_demo
         {
             makeNewFolder(listView1, listView2, leftDirect, rightDirect);
         }
+
+
+        //this shit will be delete file
+
+        public bool IsDirectoryEmpty(string path)
+        {
+            string[] dirs = System.IO.Directory.GetDirectories(path);
+            string[] files = System.IO.Directory.GetFiles(path);
+            return dirs.Length == 0 && files.Length == 0;
+            //true is no sub
+        }
+
+        private void deleteFile(ListView listViewNum, DirectoryInfo directNum)
+        {
+            if (listViewNum.SelectedItems[0].Name == "File")
+            {
+                FileInfo file = listViewNum.SelectedItems[0].Tag as FileInfo;
+                file.Delete();
+            }
+            else
+            {
+                if (IsDirectoryEmpty(directNum.FullName))
+                {
+                    directNum.Delete();
+                }
+                else
+                {
+                    //delete cac file o trong folder
+                    directNum = listViewNum.SelectedItems[0].Tag as DirectoryInfo;
+                    foreach (FileInfo file in directNum.GetFiles())
+                        File.Delete(file.FullName);
+                    foreach (string directory in Directory.GetDirectories(directNum.FullName))
+                        Directory.Delete(directory);
+                    Directory.Delete(directNum.FullName);
+                }
+            }
+        }
+        private void delete_click(object sender, EventArgs e)
+        {
+            if (listview1_isActived)
+                deleteFile(listView1, leftDirect);
+            else
+                deleteFile(listView2, rightDirect);
+        }
+
+
     }
 }
