@@ -11,7 +11,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Windows.Input;
 using static First_demo.ViewForm;
-using System.Runtime.InteropServices;
+using static First_demo.NewFolderName;
 
 
 namespace First_demo
@@ -23,8 +23,9 @@ namespace First_demo
         DirectoryInfo leftDirect;
         DirectoryInfo rightDirect;
         string notepadLink = "C:\\Windows\\system32\\notepad.exe";
-        string vscodeLink = "C:\\Users\\nguyn\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe"; 
+        string vscodeLink = "C:\\Users\\nguyn\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe";
         bool listview1_isActived = true;
+        
 
         public Form1()
         {
@@ -137,11 +138,13 @@ namespace First_demo
         {
             listView1.Refresh();
             textBox1.Refresh();
+            Fill(leftDirect, listView1);
         }
         private void refreshButton2_Clicks(object sender, EventArgs e)
         {
             listView2.Refresh();
             textBox2.Refresh();
+            Fill(rightDirect, listView2);
         }
         //Event Click
         private void List1_SelectedIndexChanged(object sender, EventArgs e)
@@ -237,11 +240,11 @@ namespace First_demo
         private void editFile_button(ListView listViewNum)
         {
             FileInfo file = listViewNum.SelectedItems[0].Tag as FileInfo;
-            if (MessageBox.Show("Bạn muốn mở bằng VS Code không??", @"Noticed me !!!", MessageBoxButtons.YesNo) == DialogResult.Yes) 
+            if (MessageBox.Show("Bạn muốn mở bằng VS Code không??", @"Noticed me !!!", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
                 Process.Start(vscodeLink, file.FullName);
             }
-            else 
+            else
             {
                 Process.Start(notepadLink, file.FullName);
             }
@@ -319,7 +322,55 @@ namespace First_demo
             return Icon.FromHandle(info.hIcon);
         }*/
 
+        //make new folder
+        int countSameFolder = 1;
+        private void makeNewFolder(ListView list1, ListView list2, DirectoryInfo direct1, DirectoryInfo direct2)
+        {
+            
+            string defaultName = "New Folder";
+            if (listview1_isActived == true)
+            {
+                //direct1 = list1.SelectedItems[0].Tag as DirectoryInfo;
+                FileInfo[] file = direct1.GetFiles();
 
+                string subFolder = Path.Combine(direct1.FullName, defaultName);
+                if (!Directory.Exists(subFolder))
+                {
+                    Directory.CreateDirectory(Path.Combine(direct1.FullName, defaultName));
+                }
+                else
+                {
+                    ++countSameFolder;
+                    string subName = defaultName + " " + (countSameFolder).ToString();
+                    Directory.CreateDirectory(Path.Combine(direct1.FullName, subName));
+                }
+                countSameFolder = 1;
+                list1.Refresh();
+            }
+            else
+            {
+                //direct2 = list2.SelectedItems[0].Tag as DirectoryInfo;
+                FileInfo[] file = direct2.GetFiles();
 
+                string subFolder = Path.Combine(direct2.FullName, defaultName);
+                if (!Directory.Exists(subFolder))
+                {
+                    Directory.CreateDirectory(Path.Combine(direct2.FullName, defaultName));
+                }
+                else
+                {
+                    ++countSameFolder;
+                    string subName = defaultName + " " + (countSameFolder).ToString();
+                    Directory.CreateDirectory(Path.Combine(direct2.FullName, subName));
+                }
+                countSameFolder = 1;
+                list2.Refresh();
+            }
+        }
+
+        private void newFolder_click(object sender, EventArgs e)
+        {
+            makeNewFolder(listView1, listView2, leftDirect, rightDirect);
+        }
     }
 }
