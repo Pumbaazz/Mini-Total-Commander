@@ -30,11 +30,6 @@ namespace First_demo
         public Form1()
         {
             InitializeComponent();
-
-            //textBox1.TextChanged += Change_address;
-            //textBox2.TextChanged += Change_address;
-            //textBox1.KeyPress += EnterKey_addressLeft;
-            //textBox2.KeyPress += EnterKey_addressRight;
         }
 
         //load drive
@@ -46,15 +41,15 @@ namespace First_demo
                 comboBox1.Items.Add(d.Name);
                 comboBox2.Items.Add(d.Name);
             }
-            //comboBox1.SelectedItem = comboBox1.Items[0];
-            //Fill(comboBox1.Items[0].ToString(), listView1);
-
-            //comboBox2.SelectedItem = comboBox2.Items[0];
-            //Fill(comboBox2.Items[0].ToString(), listView2);
-
-            ////textBox1.Text = comboBox1.Items[0].ToString();
             leftDirect = new DirectoryInfo("C:\\");
             rightDirect = new DirectoryInfo("C:\\");
+            comboBox1.SelectedItem = comboBox1.Items[0];
+            comboBox2.SelectedItem = comboBox2.Items[0];
+            Fill(leftDirect, listView1);
+            Fill(rightDirect, listView2);
+
+            //leftDirect.TextChanged += Change_address;
+            //rightDirect.TextChanged += Change_address;
         }
 
 
@@ -132,6 +127,15 @@ namespace First_demo
             listViewNum.EndUpdate();
         }
 
+        private void Change_address(object sender, EventArgs args)
+        {
+            TextBox textBoxNum = sender as TextBox;
+            if (textBoxNum.Text.Contains("\r\n") || textBoxNum.Text.Contains("\n"))
+            {
+                textBoxNum.Text = textBoxNum.Text.Replace("\r\n", "");
+                textBoxNum.Text = textBoxNum.Text.Replace("\n", "");
+            }
+        }
 
         //Refresh Button
         private void refreshButton1_Clicks(object sender, EventArgs e)
@@ -323,14 +327,16 @@ namespace First_demo
         }*/
 
         //make new folder
-        int countSameFolder = 1;
+        
         private void makeNewFolder(ListView list1, ListView list2, DirectoryInfo direct1, DirectoryInfo direct2)
         {
-            
+            int countSameFolder = 1;
             string defaultName = "New Folder";
+
+            //this is using for listview1
             if (listview1_isActived == true)
             {
-                //direct1 = list1.SelectedItems[0].Tag as DirectoryInfo;
+                //direct1 = textBox1 as DirectoryInfo;
                 FileInfo[] file = direct1.GetFiles();
 
                 string subFolder = Path.Combine(direct1.FullName, defaultName);
@@ -342,14 +348,20 @@ namespace First_demo
                 {
                     ++countSameFolder;
                     string subName = defaultName + " " + (countSameFolder).ToString();
+                    while (Directory.Exists(Path.Combine(direct1.FullName, subName)))
+                    {
+                        countSameFolder++;
+                        subName = defaultName + " " + (countSameFolder).ToString();
+                    }
                     Directory.CreateDirectory(Path.Combine(direct1.FullName, subName));
                 }
-                countSameFolder = 1;
-                list1.Refresh();
+                listView1.Refresh();
+                Fill(leftDirect, listView1);
             }
+
+            //this is using for listview2
             else
             {
-                //direct2 = list2.SelectedItems[0].Tag as DirectoryInfo;
                 FileInfo[] file = direct2.GetFiles();
 
                 string subFolder = Path.Combine(direct2.FullName, defaultName);
@@ -361,10 +373,15 @@ namespace First_demo
                 {
                     ++countSameFolder;
                     string subName = defaultName + " " + (countSameFolder).ToString();
+                    while(Directory.Exists(Path.Combine(direct2.FullName, subName)))
+                    {
+                        countSameFolder++;
+                        subName = defaultName + " " + (countSameFolder).ToString();
+                    }
                     Directory.CreateDirectory(Path.Combine(direct2.FullName, subName));
                 }
-                countSameFolder = 1;
-                list2.Refresh();
+                listView2.Refresh();
+                Fill(rightDirect, listView2);
             }
         }
 
@@ -386,35 +403,56 @@ namespace First_demo
 
         private void deleteFile(ListView listViewNum, DirectoryInfo directNum)
         {
+            //delete file thoi
             if (listViewNum.SelectedItems[0].Name == "File")
             {
-                FileInfo file = listViewNum.SelectedItems[0].Tag as FileInfo;
-                file.Delete();
+                if (MessageBox.Show("Bạn có chắc là muốn xóa file này không??", @"Noticed me !!!", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                {
+                    FileInfo file = listViewNum.SelectedItems[0].Tag as FileInfo;
+                    file.Delete();
+                }
             }
             else
             {
                 if (IsDirectoryEmpty(directNum.FullName))
                 {
-                    directNum.Delete();
+                    if (MessageBox.Show("Bạn có chắc là muốn xóa cái folder này không??", @"Noticed me !!!", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                    {
+                        directNum.Delete();
+                    }
                 }
                 else
                 {
-                    //delete cac file o trong folder
-                    directNum = listViewNum.SelectedItems[0].Tag as DirectoryInfo;
-                    foreach (FileInfo file in directNum.GetFiles())
-                        File.Delete(file.FullName);
-                    foreach (string directory in Directory.GetDirectories(directNum.FullName))
-                        Directory.Delete(directory);
-                    Directory.Delete(directNum.FullName);
+                    if (MessageBox.Show("Bạn có chắc là muốn xóa cái folder này không??\n Trong folder này còn chứa dữ liệu đó!!!", @"Noticed me !!!", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                    {
+                        //delete cac file o trong folder
+                        directNum = listViewNum.SelectedItems[0].Tag as DirectoryInfo;
+                        foreach (FileInfo file in directNum.EnumerateFiles())
+                            File.Delete(file.FullName);
+                        //foreach (string directory in Directory.GetDirectories(directNum.FullName))
+                        //    Directory.Delete(directory);
+                        foreach (DirectoryInfo dir in directNum.EnumerateDirectories())
+                        {
+                            dir.Delete(true);
+                        }
+                        Directory.Delete(directNum.FullName);
+                    }
                 }
             }
         }
         private void delete_click(object sender, EventArgs e)
         {
             if (listview1_isActived)
+            {
                 deleteFile(listView1, leftDirect);
+                Fill(leftDirect, listView1);
+            }
             else
+            {
                 deleteFile(listView2, rightDirect);
+                Fill(rightDirect, listView2);
+
+            }
         }
 
 
