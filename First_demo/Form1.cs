@@ -470,10 +470,9 @@ namespace First_demo
             else
             {
                 directSource = source.SelectedItems[0].Tag as DirectoryInfo;
-                //directDesti = desti.SelectedItems[0].Tag as DirectoryInfo;
-                //Directory.Move(directSource.FullName, directDesti.FullName);
-                string directDest = textBox2.Text;
-                Directory.Move(directSource.FullName, directDest);
+                directDesti = desti.SelectedItems[0].Tag as DirectoryInfo;
+                string destination = Path.Combine(directDesti.FullName, directSource.Name);
+                Directory.Move(directSource.FullName, destination);
             }
         }
         private void move_Click(object sender, EventArgs e)
