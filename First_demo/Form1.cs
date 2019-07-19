@@ -252,7 +252,7 @@ namespace First_demo
             {
                 Process.Start(notepadLink, file.FullName);
             }
-            //bug nhẹ là không nhận dấu space
+            //bug nhẹ là không nhận dấu space, vd: New Text document.txt mở bằng vscode ra 3 file mới??, mở notepad bình thường
         }
         private void listview1_click(object sender, EventArgs e)
         {
@@ -455,6 +455,37 @@ namespace First_demo
             }
         }
 
+        //and now this shit will be the move file and folder :>
 
+        private void moveFileOrFolder(ListView source, ListView desti, DirectoryInfo directSource, DirectoryInfo directDesti)
+        {
+            //move 1 file thôi nè
+            if (source.SelectedItems[0].Name == "File")
+            {
+                FileInfo file = source.SelectedItems[0].Tag as FileInfo;
+                string sourcePath = Path.Combine(textBox2.Text, file.Name);
+                File.Move(file.FullName, sourcePath);
+            }
+            //move 1 folder thôi nè
+            else
+            {
+                directSource = source.SelectedItems[0].Tag as DirectoryInfo;
+                //directDesti = desti.SelectedItems[0].Tag as DirectoryInfo;
+                //Directory.Move(directSource.FullName, directDesti.FullName);
+                string directDest = textBox2.Text;
+                Directory.Move(directSource.FullName, directDest);
+            }
+        }
+        private void move_Click(object sender, EventArgs e)
+        {
+            if (listview1_isActived)
+            {
+                moveFileOrFolder(listView1, listView2, leftDirect, rightDirect);
+            }
+            else
+            {
+                moveFileOrFolder(listView2, listView1, rightDirect, leftDirect);
+            }
+        }
     }
 }

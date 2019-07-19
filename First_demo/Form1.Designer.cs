@@ -312,6 +312,7 @@
             this.button6.TabIndex = 12;
             this.button6.Text = "Move";
             this.button6.UseVisualStyleBackColor = true;
+            this.button6.Click += new System.EventHandler(this.move_Click);
             // 
             // button7
             // 
