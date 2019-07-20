@@ -71,6 +71,49 @@ namespace First_demo
             Fill(rightDirect, listView2);
         }
 
+        //prevent edit combobox
+        private void Combo1_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            e.Handled = true;
+        }
+        private void Combo2_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            e.Handled = true;
+        }
+        //edit textbox to change directory
+        private void editTextBox_left(object sender, KeyPressEventArgs args)
+        {
+            if(args.KeyChar == (char)13)
+            {
+                DirectoryInfo direct = new DirectoryInfo(textBox1.Text);
+                if (!direct.Exists)
+                {
+                    MessageBox.Show("Path does not exist", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else
+                {
+                    leftDirect = direct;
+                    Fill(direct, listView1);
+                }
+            }
+        }
+
+        private void editTextBox_right(object sender, KeyPressEventArgs args)
+        {
+            if (args.KeyChar == (char)13)
+            {
+                DirectoryInfo direct = new DirectoryInfo(textBox2.Text);
+                if (!direct.Exists)
+                {
+                    MessageBox.Show("Path does not exist", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else
+                {
+                    leftDirect = direct;
+                    Fill(direct, listView2);
+                }
+            }
+        }
         //fill the list of file in list view
         private void gridView(object sender, EventArgs e)
         {
@@ -83,7 +126,11 @@ namespace First_demo
             listView1.View = View.List;
             listView2.View = View.List;
         }
-
+        private void detailView(object sender, EventArgs e)
+        {
+            listView1.View = View.Details;
+            listView2.View = View.Details;
+        }
         private void Fill(DirectoryInfo directoryNum, ListView listViewNum)
         {
             listViewNum.BeginUpdate();
@@ -113,7 +160,6 @@ namespace First_demo
                     lvi.SubItems.Add("Folder");
                     lvi.Tag = dir;
                     lvi.Name = "Directory";
-                    lvi.SubItems.Add("<--DIR-->");
                     lvi.SubItems.Add(dir.LastWriteTime.ToString());
                     lvi.ImageIndex = 0;
                     listViewNum.Items.Add(lvi);
@@ -129,13 +175,11 @@ namespace First_demo
                     lvi.SubItems.Add("File");
                     lvi.Tag = file;
                     lvi.Name = "File";
-                    //lvi.SubItems.Add(FormattedSize(file.Length));
                     lvi.SubItems.Add(file.LastWriteTime.ToString());
                     icons.Images.Add(Icon.ExtractAssociatedIcon(file.FullName));
                     lvi.ImageIndex = countIcon;
                     ++countIcon;
                     listViewNum.Items.Add(lvi);
-                    //Icon icon = GetIcon(directoryNum.FullName, false, false);
                 }
             }
             listViewNum.LargeImageList = icons;
@@ -490,5 +534,7 @@ namespace First_demo
                 }
             }
         }
+
+
     }
 }
