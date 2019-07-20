@@ -11,7 +11,9 @@ using System.IO;
 using System.Diagnostics;
 using System.Windows.Input;
 using static First_demo.ViewForm;
+using static First_demo.ExtractIcon;
 using static First_demo.NewFolderName;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
 
 
 namespace First_demo
@@ -50,6 +52,8 @@ namespace First_demo
 
             //leftDirect.TextChanged += Change_address;
             //rightDirect.TextChanged += Change_address;
+
+
         }
 
 
@@ -84,6 +88,12 @@ namespace First_demo
         {
             listViewNum.BeginUpdate();
             listViewNum.Items.Clear();
+
+            ImageList icons = new ImageList();
+            icons.ImageSize = new Size(30, 30);
+            icons.ColorDepth = ColorDepth.Depth32Bit;
+            icons.Images.Add(Image.FromFile("D:\\Study Ground\\Univer\\Term 6\\Windows coding\\Project\\Project-Windows-Form\\First_demo\\folder.png"));
+
             if (directoryNum.Parent != null)
             {
                 ListViewItem rollBack = new ListViewItem("...");
@@ -96,6 +106,7 @@ namespace First_demo
             FileInfo[] files = directoryNum.GetFiles();
             foreach (DirectoryInfo dir in Directories)
             {
+                
                 if (!dir.Attributes.HasFlag(FileAttributes.System))
                 {
                     ListViewItem lvi = new ListViewItem(dir.Name);
@@ -104,11 +115,11 @@ namespace First_demo
                     lvi.Name = "Directory";
                     lvi.SubItems.Add("<--DIR-->");
                     lvi.SubItems.Add(dir.LastWriteTime.ToString());
+                    lvi.ImageIndex = 0;
                     listViewNum.Items.Add(lvi);
-                    //Icon icon = GetIcon(directoryNum.FullName, false, false);
                 }
             }
-
+            int countIcon = 0;
             foreach (FileInfo file in files)
             {
                 //bool isHidden = (File.GetAttributes(file.FullName) & FileAttributes.Hidden) == FileAttributes.Hidden;
@@ -120,10 +131,15 @@ namespace First_demo
                     lvi.Name = "File";
                     //lvi.SubItems.Add(FormattedSize(file.Length));
                     lvi.SubItems.Add(file.LastWriteTime.ToString());
+                    icons.Images.Add(Icon.ExtractAssociatedIcon(file.FullName));
+                    lvi.ImageIndex = countIcon;
+                    ++countIcon;
                     listViewNum.Items.Add(lvi);
                     //Icon icon = GetIcon(directoryNum.FullName, false, false);
                 }
             }
+            listViewNum.LargeImageList = icons;
+            listViewNum.SmallImageList = icons;
             listViewNum.EndUpdate();
         }
 
@@ -274,57 +290,8 @@ namespace First_demo
             }
         }
 
-        /*this is some of stackoverflow code for icon system
+        //this is some of stackoverflow code for icon system
 
-        [DllImport("Shell32.dll")]
-        private static extern int SHGetFileInfo(
-                string pszPath, uint dwFileAttributes,
-                out SHFILEINFO psfi, uint cbfileInfo,
-                SHGFI uFlags);
-
-        private struct SHFILEINFO
-        {
-            public SHFILEINFO(bool b)
-            {
-                hIcon = IntPtr.Zero; iIcon = 0; dwAttributes = 0; szDisplayName = ""; szTypeName = "";
-            }
-            public IntPtr hIcon;
-            public int iIcon;
-            public uint dwAttributes;
-            public string szDisplayName;
-            public string szTypeName;
-        };
-
-        private enum SHGFI
-        {
-            SmallIcon = 0x00000001,
-            OpenIcon = 0x00000002,
-            LargeIcon = 0x00000000,
-            Icon = 0x00000100,
-            DisplayName = 0x00000200,
-            Typename = 0x00000400,
-            SysIconIndex = 0x00004000,
-            LinkOverlay = 0x00008000,
-            UseFileAttributes = 0x00000010
-        }
-
-        public static Icon GetIcon(string strPath, bool bSmall, bool bOpen)
-        {
-            SHFILEINFO info = new SHFILEINFO(true);
-            int cbFileInfo = Marshal.SizeOf(info);
-            SHGFI flags;
-
-            if (bSmall)
-                flags = SHGFI.Icon | SHGFI.SmallIcon;
-            else
-                flags = SHGFI.Icon | SHGFI.LargeIcon;
-
-            if (bOpen) flags = flags | SHGFI.OpenIcon;
-
-            SHGetFileInfo(strPath, 0, out info, (uint)cbFileInfo, flags);
-
-            return Icon.FromHandle(info.hIcon);
-        }*/
 
         //make new folder
         
@@ -463,16 +430,25 @@ namespace First_demo
             if (source.SelectedItems[0].Name == "File")
             {
                 FileInfo file = source.SelectedItems[0].Tag as FileInfo;
-                string sourcePath = Path.Combine(textBox2.Text, file.Name);
+                string sourcePath = Path.Combine(textBox2.Text, file.Name);// bug to bự ngay đây
                 File.Move(file.FullName, sourcePath);
             }
-            //move 1 folder thôi nè
+            
             else
             {
                 directSource = source.SelectedItems[0].Tag as DirectoryInfo;
-                directDesti = desti.SelectedItems[0].Tag as DirectoryInfo;
-                string destination = Path.Combine(directDesti.FullName, directSource.Name);
-                Directory.Move(directSource.FullName, destination);
+                if (IsDirectoryEmpty(directSource.FullName))
+                {
+                    //move 1 folder thôi nè
+                    directDesti = desti.SelectedItems[0].Tag as DirectoryInfo;
+                    string destination = Path.Combine(directDesti.FullName, directSource.Name);
+                    Directory.Move(directSource.FullName, destination);
+                }
+                else
+                {
+                    //move 1 nùi folder với cả path nè, phải dùng copy rồi
+
+                }
             }
         }
         private void move_Click(object sender, EventArgs e)
@@ -484,6 +460,34 @@ namespace First_demo
             else
             {
                 moveFileOrFolder(listView2, listView1, rightDirect, leftDirect);
+            }
+        }
+        //copy file and folder
+        private void copyFileOrFolder(ListView source, ListView desti, DirectoryInfo directSource, DirectoryInfo directDesti)
+        {
+            //move 1 file thôi nè
+            if (source.SelectedItems[0].Name == "File")
+            {
+                FileInfo file = source.SelectedItems[0].Tag as FileInfo;
+                string sourcePath = Path.Combine(textBox2.Text, file.Name);
+                File.Copy(file.FullName, sourcePath);
+            }
+
+            else
+            {
+                directSource = source.SelectedItems[0].Tag as DirectoryInfo;
+                if (IsDirectoryEmpty(directSource.FullName))
+                {
+                    //move 1 folder thôi nè
+                    directDesti = desti.SelectedItems[0].Tag as DirectoryInfo;
+                    string destination = Path.Combine(directDesti.FullName, directSource.Name);
+                   //  Directory.GetAccessControl(directSource.FullName, destination);
+                }
+                else
+                {
+                    //move 1 nùi folder với cả path nè, phải dùng copy rồi
+
+                }
             }
         }
     }
