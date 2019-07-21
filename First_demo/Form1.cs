@@ -281,11 +281,11 @@ namespace First_demo
         }
         private void listview1_click(object sender, EventArgs e)
         {
-            listview1_isActived = true;
+                listview1_isActived = true;
         }
         private void listview2_click(object sender, EventArgs e)
         {
-            listview1_isActived = false;
+                listview1_isActived = false;
         }
         private void editFile_Click(object sender, EventArgs e)
         {
@@ -541,11 +541,11 @@ namespace First_demo
                                     Directory.CreateDirectory(Path.Combine(textBox2.Text, listView1.SelectedItems[0].Text));
                                     foreach (DirectoryInfo dir in ahihi.EnumerateDirectories())
                                     {
-                                        dir.CreateSubdirectory(Path.Combine(Path.Combine(textBox2.Text, listView1.SelectedItems[0].Text), dir.Name));
+                                        Directory.CreateDirectory(Path.Combine(Path.Combine(Path.Combine(textBox2.Text, listView1.SelectedItems[0].Text), dir.Name))); 
                                     }
                                     foreach (FileInfo file in ahihi.EnumerateFiles())
                                     {
-                                        File.Move(file.FullName, Path.Combine(Path.Combine(textBox2.Text, listView1.SelectedItems[0].Text), file.Name));
+                                        File.Copy(file.FullName, Path.Combine(Path.Combine(textBox2.Text, listView1.SelectedItems[0].Text), file.Name));
                                     }
 
 
@@ -562,7 +562,7 @@ namespace First_demo
                                         Directory.CreateDirectory(Path.Combine(textBox2.Text, listView1.SelectedItems[0].Text));
                                         foreach (DirectoryInfo dir in ahihi.EnumerateDirectories())
                                         {
-                                            dir.CreateSubdirectory(Path.Combine(Path.Combine(textBox2.Text, listView1.SelectedItems[0].Text), dir.Name));
+                                            Directory.CreateDirectory(Path.Combine(textBox2.Text, dir.Name));
                                         }
                                         foreach (FileInfo file in ahihi.EnumerateFiles())
                                         {
@@ -630,7 +630,7 @@ namespace First_demo
                                     Directory.CreateDirectory(Path.Combine(textBox1.Text, listView2.SelectedItems[0].Text));
                                     foreach (DirectoryInfo dir in ahihi.EnumerateDirectories())
                                     {
-                                        dir.CreateSubdirectory(Path.Combine(Path.Combine(textBox1.Text, listView2.SelectedItems[0].Text), dir.Name));
+                                        Directory.CreateDirectory(Path.Combine(Path.Combine(textBox1.Text, listView2.SelectedItems[0].Text), dir.Name));
                                     }
                                     foreach (FileInfo file in ahihi.EnumerateFiles())
                                     {
@@ -651,7 +651,7 @@ namespace First_demo
                                         Directory.CreateDirectory(Path.Combine(textBox1.Text, listView2.SelectedItems[0].Text));
                                         foreach (DirectoryInfo dir in ahihi.EnumerateDirectories())
                                         {
-                                            dir.CreateSubdirectory(Path.Combine(Path.Combine(textBox1.Text, listView2.SelectedItems[0].Text), dir.Name));
+                                            Directory.CreateDirectory(Path.Combine(Path.Combine(textBox1.Text, listView2.SelectedItems[0].Text), dir.Name));
                                         }
                                         foreach (FileInfo file in ahihi.EnumerateFiles())
                                         {
@@ -668,198 +668,200 @@ namespace First_demo
         //---------------------------------------------------------------------------------------------------------------------------------------------------------
         private void move_click(object sender, EventArgs e)
         {
-            if (MessageBox.Show("Bạn có chắc là muốn move không", "Noticed!!", MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) == DialogResult.Yes)
-            {
-                if (listview1_isActived)
+            try {
+                if (MessageBox.Show("Bạn có chắc là muốn move không", "Noticed!!", MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) == DialogResult.Yes)
                 {
-                    if (listView1.SelectedItems[0].Name == "File") //cái đang chọn phải là file mới chạy đoạn này
+                    if (listview1_isActived)
                     {
-                        FileInfo file = listView1.SelectedItems[0].Tag as FileInfo;
-                        if (File.Exists(Path.Combine(textBox2.Text, file.Name)))    //xét điều kiện file bị trùng, có thì hỏi overwrite không
+                        if (listView1.SelectedItems[0].Name == "File") //cái đang chọn phải là file mới chạy đoạn này
                         {
-                            if (MessageBox.Show("Bạn chắc không??\n Điều này sẽ làm file của bạn bị overwrite", "Noticed!!!", MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) == DialogResult.Yes)
+                            FileInfo file = listView1.SelectedItems[0].Tag as FileInfo;
+                            if (File.Exists(Path.Combine(textBox2.Text, file.Name)))    //xét điều kiện file bị trùng, có thì hỏi overwrite không
                             {
-                                File.Delete(Path.Combine(textBox2.Text, file.Name));
-                                File.Move(file.FullName, Path.Combine(textBox2.Text, file.Name));
+                                if (MessageBox.Show("Bạn chắc không??\n Điều này sẽ làm file của bạn bị overwrite", "Noticed!!!", MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) == DialogResult.Yes)
+                                {
+                                    File.Delete(Path.Combine(textBox2.Text, file.Name));
+                                    File.Move(file.FullName, Path.Combine(textBox2.Text, file.Name));
+                                }
                             }
-                        }
-                        else
-                            //đoạn này file không bị trùng nên move bình thường
-                            File.Move(file.FullName, Path.Combine(textBox2.Text, file.Name));
-                    }
-
-
-                    if (listView1.SelectedItems[0].Name != "File")
-                    {
-                        if (IsDirectoryEmpty(Path.Combine(textBox1.Text, listView1.SelectedItems[0].Text)))
-                        //điều kiện check có subfile/subfolder trong cái folder cần move, trong list 1 nhóe
-                        //chỉ xét ở trường hợp list1 qua list 2 trước
-                        {
-                            //không có sub thì chạy cái này
-                            DirectoryInfo folder = listView1.SelectedItems[0].Tag as DirectoryInfo;
-                            if (!Directory.Exists(Path.Combine(textBox2.Text, folder.Name)))
-                            //nếu không tồn tại đường dẫn combine, copy qua tạo đường dẫn mới
-                            {
-                                Directory.Move(folder.FullName, Path.Combine(textBox2.Text, folder.Name));
-                            }
-
                             else
+                                //đoạn này file không bị trùng nên move bình thường
+                                File.Move(file.FullName, Path.Combine(textBox2.Text, file.Name));
+                        }
+
+
+                        if (listView1.SelectedItems[0].Name != "File")
+                        {
+                            if (IsDirectoryEmpty(Path.Combine(textBox1.Text, listView1.SelectedItems[0].Text)))
+                            //điều kiện check có subfile/subfolder trong cái folder cần move, trong list 1 nhóe
+                            //chỉ xét ở trường hợp list1 qua list 2 trước
                             {
-                                //đây là bị trùng nè, hỏi có sure kèo không?
-                                if (MessageBox.Show("Bạn có chắc không??\n Điều này sẽ làm cho folder bạn bị overwrite", "Noticed!!!", MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) == DialogResult.Yes)
+                                //không có sub thì chạy cái này
+                                DirectoryInfo folder = listView1.SelectedItems[0].Tag as DirectoryInfo;
+                                if (!Directory.Exists(Path.Combine(textBox2.Text, folder.Name)))
+                                //nếu không tồn tại đường dẫn combine, copy qua tạo đường dẫn mới
                                 {
-                                    Directory.Delete(Path.Combine(textBox2.Text, folder.Name));
-                                    Directory.CreateDirectory(Path.Combine(textBox2.Text, folder.Name));
+                                    Directory.Move(folder.FullName, Path.Combine(textBox2.Text, folder.Name));
+                                }
+
+                                else
+                                {
+                                    //đây là bị trùng nè, hỏi có sure kèo không?
+                                    if (MessageBox.Show("Bạn có chắc không??\n Điều này sẽ làm cho folder bạn bị overwrite", "Noticed!!!", MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) == DialogResult.Yes)
+                                    {
+                                        Directory.Delete(Path.Combine(textBox2.Text, folder.Name));
+                                        Directory.CreateDirectory(Path.Combine(textBox2.Text, folder.Name));
+                                    }
                                 }
                             }
-                        }
-                        else
-                        //có sub thì chạy đoạn này
-                        {
-                            if (MessageBox.Show("Bạn chắc không??\n Điều này sẽ làm folder của bạn bị overwrite", "Noticed!!!", MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) == DialogResult.Yes)
+                            else
+                            //có sub thì chạy đoạn này
                             {
-
-                                //trường hợp có sub và không trùng
-                                if (!Directory.Exists(Path.Combine(textBox2.Text, listView1.SelectedItems[0].Text)))
+                                if (MessageBox.Show("Bạn chắc không??\n Điều này sẽ làm folder của bạn bị overwrite", "Noticed!!!", MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) == DialogResult.Yes)
                                 {
-                                    //dùng cái copy qua chứ move qua nó mất đường dẫn 
-                                    DirectoryInfo ahihi = listView1.SelectedItems[0].Tag as DirectoryInfo;
-                                    Directory.CreateDirectory(Path.Combine(textBox2.Text, listView1.SelectedItems[0].Text));
-                                    foreach (DirectoryInfo dir in ahihi.EnumerateDirectories())
+
+                                    //trường hợp có sub và không trùng
+                                    if (!Directory.Exists(Path.Combine(textBox2.Text, listView1.SelectedItems[0].Text)))
                                     {
-                                        Directory.Move(dir.FullName, Path.Combine(Path.Combine(textBox2.Text, listView1.SelectedItems[0].Text), dir.Name));
-                                    }
-                                    foreach (FileInfo file in ahihi.EnumerateFiles())
-                                    {
-                                        File.Move(file.FullName, Path.Combine(Path.Combine(textBox2.Text, listView1.SelectedItems[0].Text), file.Name));
-                                    }
-
-
-
-                                }
-                                else
-                                //trường hợp có sub và bị trùng
-                                {
-                                    if (MessageBox.Show("Bạn chắc chứ??\n Điều này làm cả file và folder con bị overwrite", "Noticed!!!", MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) == DialogResult.Yes)
-                                    {
-                                        //deleteFile(listView2, rightDirect, textBox2);
-
+                                        //dùng cái copy qua chứ move qua nó mất đường dẫn 
                                         DirectoryInfo ahihi = listView1.SelectedItems[0].Tag as DirectoryInfo;
-                                        foreach (DirectoryInfo dir in ahihi.EnumerateDirectories())
-                                        {
-                                            Directory.Delete(Path.Combine(Path.Combine(textBox2.Text, listView1.SelectedItems[0].Text), dir.Name));
-                                        }
-                                        foreach (FileInfo file in ahihi.EnumerateFiles())
-                                        {
-                                            File.Delete(Path.Combine(Path.Combine(textBox2.Text, listView1.SelectedItems[0].Text), file.Name));
-                                        }
-
                                         Directory.CreateDirectory(Path.Combine(textBox2.Text, listView1.SelectedItems[0].Text));
                                         foreach (DirectoryInfo dir in ahihi.EnumerateDirectories())
                                         {
-                                            dir.CreateSubdirectory(Path.Combine(Path.Combine(textBox2.Text, listView1.SelectedItems[0].Text), dir.Name));
+                                            Directory.Move(dir.FullName, Path.Combine(Path.Combine(textBox2.Text, listView1.SelectedItems[0].Text), dir.Name));
                                         }
                                         foreach (FileInfo file in ahihi.EnumerateFiles())
                                         {
                                             File.Move(file.FullName, Path.Combine(Path.Combine(textBox2.Text, listView1.SelectedItems[0].Text), file.Name));
                                         }
+                                        Directory.Delete(ahihi.FullName);
+                                    }
+                                    else
+                                    //trường hợp có sub và bị trùng
+                                    {
+                                        if (MessageBox.Show("Bạn chắc chứ??\n Điều này làm cả file và folder con bị overwrite", "Noticed!!!", MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) == DialogResult.Yes)
+                                        {
+                                            //deleteFile(listView2, rightDirect, textBox2);
+
+                                            DirectoryInfo ahihi = listView1.SelectedItems[0].Tag as DirectoryInfo;
+                                            foreach (FileInfo file in ahihi.EnumerateFiles())
+                                            {
+                                                File.Delete(Path.Combine(Path.Combine(textBox2.Text, listView1.SelectedItems[0].Text), file.Name));
+                                            }
+                                            foreach (DirectoryInfo dir in ahihi.EnumerateDirectories())
+                                            {
+                                                Directory.Delete(Path.Combine(Path.Combine(textBox2.Text, listView1.SelectedItems[0].Text), dir.Name));
+                                            }
+
+
+                                            Directory.CreateDirectory(Path.Combine(textBox2.Text, listView1.SelectedItems[0].Text));
+                                            foreach (DirectoryInfo dir in ahihi.EnumerateDirectories())
+                                            {
+                                                Directory.CreateDirectory(Path.Combine(Path.Combine(textBox2.Text, listView1.SelectedItems[0].Text), dir.Name));
+                                            }
+                                            foreach (FileInfo file in ahihi.EnumerateFiles())
+                                            {
+                                                File.Move(file.FullName, Path.Combine(Path.Combine(textBox2.Text, listView1.SelectedItems[0].Text), file.Name));
+                                            }
+                                            Directory.Delete(ahihi.FullName);
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                }
-//---------------------------------------------------------------------------------------------------------------------------------------------------------
-//list2 qua list1
-                else
-                {
-                    if (listView2.SelectedItems[0].Name == "File") //cái đang chọn phải là file mới chạy đoạn này
+                    //---------------------------------------------------------------------------------------------------------------------------------------------------------
+                    //list2 qua list1
+                    else
                     {
-                        FileInfo file = listView2.SelectedItems[0].Tag as FileInfo;
-                        if (File.Exists(Path.Combine(textBox1.Text, file.Name)))    //xét điều kiện file bị trùng, có thì hỏi overwrite không
+                        if (listView2.SelectedItems[0].Name == "File") //cái đang chọn phải là file mới chạy đoạn này
                         {
-                            if (MessageBox.Show("Bạn chắc không??\n Điều này sẽ làm file của bạn bị overwrite", "Noticed!!!", MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) == DialogResult.Yes)
+                            FileInfo file = listView2.SelectedItems[0].Tag as FileInfo;
+                            if (File.Exists(Path.Combine(textBox1.Text, file.Name)))    //xét điều kiện file bị trùng, có thì hỏi overwrite không
                             {
-                                File.Delete(Path.Combine(textBox1.Text, file.Name));
-                                File.Move(file.FullName, Path.Combine(textBox1.Text, file.Name));
+                                if (MessageBox.Show("Bạn chắc không??\n Điều này sẽ làm file của bạn bị overwrite", "Noticed!!!", MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) == DialogResult.Yes)
+                                {
+                                    File.Delete(Path.Combine(textBox1.Text, file.Name));
+                                    File.Move(file.FullName, Path.Combine(textBox1.Text, file.Name));
+                                }
                             }
-                        }
-                        else
-                            //đoạn này file không bị trùng nên move bình thường
-                            File.Move(file.FullName, Path.Combine(textBox1.Text, file.Name));
-                    }
-
-
-                    if (listView2.SelectedItems[0].Name != "File")
-                    {
-                        if (IsDirectoryEmpty(Path.Combine(textBox1.Text, listView2.SelectedItems[0].Text)))
-                        //điều kiện check có subfile/subfolder trong cái folder cần move, trong list 1 nhóe
-                        //chỉ xét ở trường hợp list1 qua list 2 trước
-                        {
-                            //không có sub thì chạy cái này
-                            DirectoryInfo folder = listView2.SelectedItems[0].Tag as DirectoryInfo;
-                            if (!Directory.Exists(Path.Combine(textBox1.Text, folder.Name)))
-                            //nếu không tồn tại đường dẫn combine, copy qua tạo đường dẫn mới
-                            {
-                                Directory.Move(folder.FullName, Path.Combine(textBox1.Text, folder.Name));
-                            }
-
                             else
+                                //đoạn này file không bị trùng nên move bình thường
+                                File.Move(file.FullName, Path.Combine(textBox1.Text, file.Name));
+                        }
+
+
+                        if (listView2.SelectedItems[0].Name != "File")
+                        {
+                            if (IsDirectoryEmpty(Path.Combine(textBox1.Text, listView2.SelectedItems[0].Text)))
+                            //điều kiện check có subfile/subfolder trong cái folder cần move, trong list 1 nhóe
+                            //chỉ xét ở trường hợp list1 qua list 2 trước
                             {
-                                //đây là bị trùng nè, hỏi có sure kèo không?
-                                if (MessageBox.Show("Bạn có chắc không??\n Điều này sẽ làm cho folder bạn bị overwrite", "Noticed!!!", MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) == DialogResult.Yes)
+                                //không có sub thì chạy cái này
+                                DirectoryInfo folder = listView2.SelectedItems[0].Tag as DirectoryInfo;
+                                if (!Directory.Exists(Path.Combine(textBox1.Text, folder.Name)))
+                                //nếu không tồn tại đường dẫn combine, copy qua tạo đường dẫn mới
                                 {
-                                    Directory.Delete(Path.Combine(textBox1.Text, folder.Name));
-                                    Directory.CreateDirectory(Path.Combine(textBox1.Text, folder.Name));
+                                    Directory.Move(folder.FullName, Path.Combine(textBox1.Text, folder.Name));
+                                }
+
+                                else
+                                {
+                                    //đây là bị trùng nè, hỏi có sure kèo không?
+                                    if (MessageBox.Show("Bạn có chắc không??\n Điều này sẽ làm cho folder bạn bị overwrite", "Noticed!!!", MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) == DialogResult.Yes)
+                                    {
+                                        Directory.Delete(Path.Combine(textBox1.Text, folder.Name));
+                                        Directory.CreateDirectory(Path.Combine(textBox1.Text, folder.Name));
+                                    }
                                 }
                             }
-                        }
-                        else
-                        //có sub thì chạy đoạn này
-                        {
-                            if (MessageBox.Show("Bạn chắc không??\n Điều này sẽ làm folder của bạn bị overwrite", "Noticed!!!", MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) == DialogResult.Yes)
+                            else
+                            //có sub thì chạy đoạn này
                             {
-
-                                //trường hợp có sub và không trùng
-                                if (!Directory.Exists(Path.Combine(textBox1.Text, listView2.SelectedItems[0].Text)))
+                                if (MessageBox.Show("Bạn chắc không??\n Điều này sẽ làm folder của bạn bị overwrite", "Noticed!!!", MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) == DialogResult.Yes)
                                 {
-                                    //dùng cái copy qua chứ move qua nó mất đường dẫn 
-                                    DirectoryInfo ahihi = listView2.SelectedItems[0].Tag as DirectoryInfo;
-                                    Directory.CreateDirectory(Path.Combine(textBox1.Text, listView2.SelectedItems[0].Text));
-                                    foreach (DirectoryInfo dir in ahihi.EnumerateDirectories())
-                                    {
-                                        Directory.Move(dir.FullName, Path.Combine(Path.Combine(textBox1.Text, listView2.SelectedItems[0].Text), dir.Name));
-                                    }
-                                    foreach (FileInfo file in ahihi.EnumerateFiles())
-                                    {
-                                        File.Move(file.FullName, Path.Combine(Path.Combine(textBox1.Text, listView2.SelectedItems[0].Text), file.Name));
-                                    }
-                                }
-                                else
-                                //trường hợp có sub và bị trùng
-                                {
-                                    if (MessageBox.Show("Bạn chắc chứ??\n Điều này làm cả file và folder con bị overwrite", "Noticed!!!", MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) == DialogResult.Yes)
-                                    {
-                                        //deleteFile(listView2, rightDirect, textBox2);
 
+                                    //trường hợp có sub và không trùng
+                                    if (!Directory.Exists(Path.Combine(textBox1.Text, listView2.SelectedItems[0].Text)))
+                                    {
+                                        //dùng cái copy qua chứ move qua nó mất đường dẫn 
                                         DirectoryInfo ahihi = listView2.SelectedItems[0].Tag as DirectoryInfo;
-                                        foreach (DirectoryInfo dir in ahihi.EnumerateDirectories())
-                                        {
-                                            Directory.Delete(Path.Combine(Path.Combine(textBox1.Text, listView2.SelectedItems[0].Text), dir.Name));
-                                        }
-                                        foreach (FileInfo file in ahihi.EnumerateFiles())
-                                        {
-                                            File.Delete(Path.Combine(Path.Combine(textBox1.Text, listView2.SelectedItems[0].Text), file.Name));
-                                        }
-
                                         Directory.CreateDirectory(Path.Combine(textBox1.Text, listView2.SelectedItems[0].Text));
                                         foreach (DirectoryInfo dir in ahihi.EnumerateDirectories())
                                         {
-                                            dir.CreateSubdirectory(Path.Combine(Path.Combine(textBox1.Text, listView2.SelectedItems[0].Text), dir.Name));
+                                            Directory.Move(dir.FullName, Path.Combine(Path.Combine(textBox1.Text, listView2.SelectedItems[0].Text), dir.Name));
                                         }
                                         foreach (FileInfo file in ahihi.EnumerateFiles())
                                         {
                                             File.Move(file.FullName, Path.Combine(Path.Combine(textBox1.Text, listView2.SelectedItems[0].Text), file.Name));
+                                        }
+                                    }
+                                    else
+                                    //trường hợp có sub và bị trùng
+                                    {
+                                        if (MessageBox.Show("Bạn chắc chứ??\n Điều này làm cả file và folder con bị overwrite", "Noticed!!!", MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) == DialogResult.Yes)
+                                        {
+                                            //deleteFile(listView2, rightDirect, textBox2);
+
+                                            DirectoryInfo ahihi = listView2.SelectedItems[0].Tag as DirectoryInfo;
+                                            foreach (DirectoryInfo dir in ahihi.EnumerateDirectories())
+                                            {
+                                                Directory.Delete(Path.Combine(Path.Combine(textBox1.Text, listView2.SelectedItems[0].Text), dir.Name));
+                                            }
+                                            foreach (FileInfo file in ahihi.EnumerateFiles())
+                                            {
+                                                File.Delete(Path.Combine(Path.Combine(textBox1.Text, listView2.SelectedItems[0].Text), file.Name));
+                                            }
+
+                                            Directory.CreateDirectory(Path.Combine(textBox1.Text, listView2.SelectedItems[0].Text));
+                                            foreach (DirectoryInfo dir in ahihi.EnumerateDirectories())
+                                            {
+                                                Directory.CreateDirectory(Path.Combine(Path.Combine(textBox1.Text, listView2.SelectedItems[0].Text), dir.Name));
+                                            }
+                                            foreach (FileInfo file in ahihi.EnumerateFiles())
+                                            {
+                                                File.Move(file.FullName, Path.Combine(Path.Combine(textBox1.Text, listView2.SelectedItems[0].Text), file.Name));
+                                            }
                                         }
                                     }
                                 }
@@ -868,7 +870,11 @@ namespace First_demo
                     }
                 }
             }
-        }
+            catch(Exception f)
+            {
+                MessageBox.Show(f.Message);
+            }
+            }
         //---------------------------------------------------------------------------------------------------------------------------------------------------------
 
     }
