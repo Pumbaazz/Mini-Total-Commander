@@ -263,7 +263,7 @@ namespace First_demo
         //Help
         private void help_menuStrip(object sender, EventArgs e)
         {
-            Process.Start("Help.pdf");
+            Process.Start("D:\\Study Ground\\Univer\\Term 6\\Windows coding\\Project\\Project-Windows-Form\\First_demo\\Help.pdf");
         }
         //edit file
         private void editFile_button(ListView listViewNum)
