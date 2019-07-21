@@ -38,9 +38,11 @@
             this.textBox1.Location = new System.Drawing.Point(15, 15);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
-            this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
+            this.textBox1.ReadOnly = true;
+            this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.textBox1.Size = new System.Drawing.Size(770, 414);
             this.textBox1.TabIndex = 0;
+            this.textBox1.TabStop = false;
             // 
             // ViewForm
             // 
